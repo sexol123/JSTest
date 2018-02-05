@@ -58,6 +58,7 @@ function goWork(req) {
         var json = JSON.stringify(resp);
         console.log("json", json);
         req.open('POST', WebURL);
+        req.setRequestHeader('Content-type', 'application/json; charset=utf-8');
         req.send(json);
         req.onreadystatechange = function() {
             if (this.readyState != 4) return;
@@ -77,17 +78,17 @@ function calcExpression(a, b, operation) {
     //console.log(a + " " + operation + " " + b);
     switch (operation) {
         case "+":
-            return a - b;
+            return +a - +b;
             break;
         case "-":
             return +a + +b + 8;
             break;
         case "*":
-            if (b == 0) return 42;
+            if (b === 0) return 42;
             return a % b;
             break;
         case "/":
-            if (b == 0) return 42;
+            if (b === 0) return 42;
             return Math.floor(a / b);
             break;
         default:
@@ -97,7 +98,31 @@ function calcExpression(a, b, operation) {
 
 }
 
+function calcExpressionNormal(a, b, operation) {
 
+    //console.log(a + " " + operation + " " + b);
+    switch (operation) {
+        case "+":
+            return +a + +b;
+            break;
+        case "-":
+            return +a - +b;
+            break;
+        case "*":
+            //if (b == 0) return 42;
+            return a * b;
+            break;
+        case "/":
+            //if (b == 0) return 42;
+            return Math.floor(a / b);
+            break;
+        default:
+            console.log("error.. ");
+            break;
+    }
+
+}
+//
 function workEncode(exp) {
     var finalArr = [];
     //console.log("Working: " + exp);
@@ -115,39 +140,43 @@ function workEncode(exp) {
 function prepareToCalc(arr) {
     var arrOp = [];
     var arrNum = [];
+    var temp;
     var i = 0;
     while (arr.length > i) {
         if (arr[i] == null || arr[i] == "\"") return;
         if (arr[i] == "*" || arr[i] == "+" || arr[i] == "/" || arr[i] == "-") {
             arrOp.push(arr[i]);
+            temp = expCalc(arrNum, arrOp);
+            arrNum.push(temp);
         } else {
             arrNum.push(arr[i]);
         }
         i++;
     }
-    //console.log(arr);
-    //console.log(arrOp);
-    //console.log(arrNum);
-    arrOp.reverse();
-    arrNum.reverse();
-    //console.log("reverse");
-    //console.log(arrOp);
-    //console.log(arrNum);
-    return expCalc(arrNum, arrOp);
+    // console.log(arr);
+    // console.log(arrOp);
+    // console.log(arrNum);
+    // arrOp.reverse();
+    // arrNum.reverse();
+    // console.log("reverse");
+    // console.log(arrOp);
+    // console.log(arrNum);
+    return arrNum.pop();
 }
 
 
+
 function expCalc(Nums, Oper) {
-    //console.log("In Oper: " + Oper);
-    //console.log("In Nums: " + Nums);
+    console.log("In Oper: " + Oper);
+    console.log("In Nums: " + Nums);
     if (Oper.length < 1) {
-        //console.log("Final Oper: " + Oper);
-        //console.log("Final returning Nums " + Nums);
+        console.log("Final Oper: " + Oper);
+        console.log("Final returning Nums " + Nums);
         return Nums.pop();
     }
     //Nums.push(calcExpressionNormal(Nums.pop(), Nums.pop(), Oper.pop()));
     Nums.push(calcExpression(Nums.pop(), Nums.pop(), Oper.pop()));
-    //console.log("Out Oper: " + Oper);
-    //console.log("Out Nums: " + Nums);
+    console.log("Out Oper: " + Oper);
+    console.log("Out Nums: " + Nums);
     return expCalc(Nums, Oper);
 }
